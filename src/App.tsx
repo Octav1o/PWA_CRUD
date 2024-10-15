@@ -1,26 +1,27 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import MovieForm from './components/MovieForm';
+import MovieList from './components/MovieList';
+import SavedMovies from './components/SavedMovies';
+import { Movie } from './models/Movie';
 
-function App() {
+const App: React.FC = () =>   {
+
+  const handleSaveToLocalStorage = (movie: Movie) => {
+    const currentSavedMovies = JSON.parse(localStorage.getItem('savedMovies') || '[]');
+    const updateSavedMovies = [...currentSavedMovies, movie];
+    localStorage.setItem('savedMovies', JSON.stringify(updateSavedMovies));
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Movies App</h1>
+      <MovieForm/>
+      <MovieList onSaveToLocalStorage={handleSaveToLocalStorage}/>
+      <SavedMovies/>
     </div>
   );
 }
 
 export default App;
+
+
