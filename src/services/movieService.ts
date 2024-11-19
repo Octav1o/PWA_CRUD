@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Movie } from "../models/Movie";
 
-const API_URL = "https://pwaback-production-3f87.up.railway.app/api/movies";
+const API_URL = "https://pwaback-production-2ffd.up.railway.app/api/movies";
 
 export const getMovies = () => axios.get<Movie[]>(API_URL);
 export const getMovie = (id: string) => axios.get<Movie>(`${API_URL}/${id}`);

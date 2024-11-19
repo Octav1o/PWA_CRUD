@@ -46,12 +46,23 @@
 // export default MovieForm;
 
 // src/components/MovieForm.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Movie } from '../models/Movie';
 import { addMovie } from '../services/movieService';
+import { sendPushNotification, sendPushSubscription } from '../services/apiService';
+import { subscribeToPushNotifications } from '../services/webPushService';
 
 const MovieForm: React.FC = () => {
     const [movie, setMovie] = useState<Movie>({ name: '', year: 0, category: '' });
+    const [subscription, setSubscription] = useState<PushSubscription | null>(null);
+
+    useEffect(() => {
+        const getSubscription = async () => {
+            const sub = await subscribeToPushNotifications();
+            setSubscription(sub);
+        }
+        getSubscription();
+    })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -62,8 +73,20 @@ const MovieForm: React.FC = () => {
         e.preventDefault();
         try {
             await addMovie(movie);
-            alert('Movie added successfully!');
+
+            
+            // alert('Movie added successfully!');
             setMovie({ name: '', year: 0, category: '' });
+            
+            if(subscription) {
+                await sendPushNotification(
+                    subscription,
+                    'Una nueva pelicula ha sido agregada',
+                    `Se agrego la pelicula: ${movie.name}`
+                );
+            } else {
+                console.error('No hay suscripcion activa para enviar la notificacion')
+            }
         } catch (error) {
             console.error('Error adding movie', error);
         }

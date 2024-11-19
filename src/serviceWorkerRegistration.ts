@@ -1,6 +1,8 @@
 // This optional code is used to register a service worker.
 // register() is not called by default.
 
+import { urlBase64ToUin8Array } from "./services/webPushService";
+
 // This lets the app load faster on subsequent visits in production, and gives
 // it offline capabilities. However, it also means that developers (and users)
 // will only see deployed updates on subsequent visits to a page, after all the
@@ -138,5 +140,26 @@ export function unregister() {
       .catch((error) => {
         console.error(error.message);
       });
+  }
+}
+
+export const registerPushNotifications = async () => {
+  if ('serviceWorker' in navigator && 'PushManager' in window) {
+    const registration = await navigator.serviceWorker.ready;
+    const VAPID_PUBLIC_KEY = 'BEVgcQRoKkL6DslTvFX7LYdqpvpUeyqhAtfUxLhnz7hAures9TIUF7OBcmPHNQME0ZGhCtNDWjkO3VvcZbpnIi4'
+
+    try {
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUin8Array(VAPID_PUBLIC_KEY!),
+      });
+
+      console.log('Push Subscription: ', subscription);
+      return subscription;
+    } catch (error) {
+      console.error('Error registering push notifications: ', error);
+    }
+  } else {
+    console.error('Service Worker or Push is not supported');
   }
 }

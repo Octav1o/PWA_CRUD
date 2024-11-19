@@ -78,3 +78,37 @@ self.addEventListener('message', (event) => {
 });
 
 // Any other custom service worker logic can go here.
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open('app-cache-v1').then((cache) => {
+      return cache.addAll([
+        '/',
+        './index.html',
+        './static/js/bundle.js',
+        './static/css/main.css'
+      ]);
+    })
+  );
+  console.log('Service Worker instalado');
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      // Si está en la caché, devuelve la respuesta cacheada
+      return response || fetch(event.request);
+    })
+  );
+  console.log('Fetch interceptado para:', event.request.url);
+});
+
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Notificacion';
+  const options = {
+    body: data.body || 'Tienes un nuevo mensaje',
+    // icon: '/icon.png'
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
