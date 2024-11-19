@@ -87,7 +87,9 @@ self.addEventListener('install', (event) => {
         './index.html',
         './static/js/bundle.js',
         './static/css/main.css'
-      ]);
+      ]).catch((error) => {
+        console.error('Error al agregar assets a la caché:', error);
+      });
     })
   );
   console.log('Service Worker instalado');
